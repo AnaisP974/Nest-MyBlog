@@ -15,7 +15,7 @@ export class UserController {
   getLogin() {}
 
   @Post('/signup')
-  postSignup(@Body() body: SignupDto) {
-    this.userService.postSignup(body);
+  async postSignup(@Body() body: SignupDto) {
+    return {message: await this.userService.postSignup(body)};
   }
 }

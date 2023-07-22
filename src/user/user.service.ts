@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { SignupDto } from './dtos/signupDto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class UserService {
@@ -10,7 +11,16 @@ export class UserService {
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
   ) {}
-  postSignup(body: SignupDto) {
-    throw new Error('Method not implemented.');
+  
+  async postSignup(body: SignupDto): Promise<string> {
+    try{
+        const {password} = body
+        const hash = await bcrypt.hash(password, 10)
+        const user = this.usersRepository.create({...body, password : hash})
+        await this.usersRepository.save(user)
+        return "User created !"
+    } catch (error) {
+        throw new ConflictException(error.message)
+    }
   }
 }
