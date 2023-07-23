@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post, Render, Session } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Render, Res, Session } from '@nestjs/common';
 import { AddPostDto } from './dtos/addPostDto';
 import { PostService } from './post.service';
 import { User } from 'src/user/user.entity';
+import { Response } from 'express';
 
 @Controller('post')
 export class PostController {
@@ -11,9 +12,24 @@ export class PostController {
     getAddPost(){}
 
     @Post("/add")
+    @Render("post/addPost")
     async postaddPost(@Body() body: AddPostDto, @Session() session: Record<string, any>) {
-        // return body
-        const currentUser: User = session.user
-        return await this.postService.postAddPost(body, currentUser)
+        try{
+            const currentUser: User = session.user
+            return await this.postService.postAddPost(body, currentUser)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    @Get("/detail/:id")
+    @Render("post/detail")
+    async getDetailPost(@Param("id") id: string, @Res() res: Response) {
+        try{
+            const post = await this.postService.getDetailPost(id)
+            return { post };
+        } catch (error) {
+            res.status(404).render("errors/404", {message : error.message})
+        }
     }
 }

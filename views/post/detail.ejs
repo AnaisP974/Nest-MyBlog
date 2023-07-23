@@ -1,0 +1,12 @@
+<%- include("../partials/header", {title : "Ajouter un article", style:"postDetail"}) %> 
+<a href="/"><<< Retour</a>
+
+<% if (locals.post) { %>
+<div class="post">
+  <h3><%= post.title %></h3>
+  <p><%= post.content %></p>
+  <p>Auteur : <%= post.user.username %></p>
+  <button><a href="/">Retour</a></button>
+</div>
+<% } %>
+<%- include("../partials/footer") %>

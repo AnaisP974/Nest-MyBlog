@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { AddPostDto } from './dtos/addPostDto';
 import { InjectRepository} from '@nestjs/typeorm';
 import { Post } from './post.entity';
@@ -17,7 +17,16 @@ export class PostService {
     }
     
     async getAllPosts() {
-      const posts = await this.postRepository.find({order : {create_at:"DESC"}})
-      return posts
+        const posts = await this.postRepository.find({order : {create_at:"DESC"}})
+        return posts
+    }
+
+    async getDetailPost(id: string) {
+        const post = await this.postRepository.findOne({
+            where : {id : +id}, 
+            relations : {user : true}
+        });
+        if(!post) throw new NotFoundException("Article inexistant");
+        return post
     }
 }
