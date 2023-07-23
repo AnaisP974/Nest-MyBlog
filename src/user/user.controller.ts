@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Render, Body, Redirect, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+import { Controller, Get, Post, Render, Body, Redirect, UseInterceptors, ClassSerializerInterceptor, Session } from '@nestjs/common';
 import { SignupDto } from './dtos/signupDto';
 import { UserService } from './user.service';
 import { LoginDto } from './dtos/loginDto';
@@ -23,7 +23,16 @@ export class UserController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Post("/login")
-  async postLogin(@Body() body: LoginDto) {
-    return await this.userService.postLogin(body)
+  @Redirect("/")
+  async postLogin(@Body() body: LoginDto, @Session() session : Record<string, any>) {
+    const user = await this.userService.postLogin(body)
+    session.user = user
+    session.connected = true
+  }
+
+  @Post("/logout")
+  @Redirect("login")
+  postLogout(@Session() session : Record<string, any>) {
+    session.destroy((err) => {})
   }
 }
